@@ -5,22 +5,11 @@
  */
 package restuv.uv;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javax.annotation.security.DenyAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.json.JsonArray;
 import javax.validation.Valid;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -30,10 +19,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -58,8 +45,9 @@ public class MisureResource {
     @Counted
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Misura> search(@Valid @QueryParam("min-quota") Integer minQuota) {
-        return store.search(minQuota);
+    public List<MisuraCalcolata> search(@Valid @QueryParam("min-quota") Integer minQuota) {
+        System.out.println(jwt.getName());
+        return store.searchMisuraCalcolata(minQuota);
     }
 
     @GET

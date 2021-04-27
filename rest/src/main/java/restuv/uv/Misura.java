@@ -7,7 +7,10 @@ package restuv.uv;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.json.bind.annotation.JsonbDateFormat;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,7 +26,8 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
  * @author alfonso
  */
 @NamedQueries({
-    @NamedQuery(name = Misura.FIND_ALL , query = "select e from Misura e order by e.quota")
+    @NamedQuery(name = Misura.FIND_ALL, query = "select e from Misura e order by e.quota"),
+    @NamedQuery(name = Misura.FIND_BY_QUOTA_MIN, query = "select e from Misura e where e.quota>= :quota order by quota")
 })
 
 @Schema(name = "Indice UV", description = "indice uv ad una certa quota")
@@ -32,7 +36,8 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public class Misura {
 
     public static final String FIND_ALL = "Misura.findAll";
-    
+    public static final String FIND_BY_QUOTA_MIN = "Misura.findByQuotaMin";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,23 +45,32 @@ public class Misura {
     @Schema(hidden = true)
     @Version
     protected Long version;
-    
+
     private int quota;
-    
+
     private double rdiretta;
-    
+
     private double rdiffusa;
 
     public Misura() {
     }
 
-    
     public Misura(int quota, double rdiretta, double rdiffusa) {
         this.quota = quota;
         this.rdiretta = rdiretta;
         this.rdiffusa = rdiffusa;
     }
 
+    public JsonObject toJson() {
+        return Json.createObjectBuilder()
+                .add("quota", this.quota)
+                .add("uv", this.rdiretta + this.rdiffusa)
+                .build();
+    }
+
+    /*
+    getter / setter
+     */
     public Long getId() {
         return id;
     }
@@ -126,7 +140,5 @@ public class Misura {
     public String toString() {
         return "Misura{" + "id=" + id + ", version=" + version + ", quota=" + quota + ", rdiretta=" + rdiretta + ", rdiffusa=" + rdiffusa + '}';
     }
-    
-    
-    
+
 }
